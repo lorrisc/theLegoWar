@@ -41,6 +41,10 @@ class Game extends Phaser.Scene {
         this.load.audio("step_right_3", "dist/assets/sounds/boots_step_right_3.wav");
         this.load.audio("flying", "dist/assets/sounds/flying.wav");
         this.load.audio("music", "dist/assets/sounds/music.mp3");
+        this.load.audio("briquet", "dist/assets/sounds/briquet.mp3");
+        this.load.audio("gun", "dist/assets/sounds/gun.mp3");
+        this.load.audio("missile", "dist/assets/sounds/missile.mp3");
+        this.load.audio("avion", "dist/assets/sounds/avion.mp3");
     }
     create() {
         window.score = 0;
@@ -115,13 +119,17 @@ class Game extends Phaser.Scene {
         this.particles.startFollow(this.player, -20, 15);
 
         this.sounds = {
-            jump: [this.sound.add("jump")],
-            land: [this.sound.add("land")],
             step_left: [this.sound.add("step_left_1"), this.sound.add("step_left_2"), this.sound.add("step_left_3")],
             step_right: [this.sound.add("step_right_1"), this.sound.add("step_right_2"), this.sound.add("step_right_3")],
-            flying: [this.sound.add("flying")],
 
-            music: this.sound.add("music", { volume: 0.5 }),
+            land: this.sound.add("land", { volume: 0.5 }),
+            jump: this.sound.add("jump", { volume: 0.3 }),
+            flying: this.sound.add("flying", { volume: 0.3 }),
+            briquet: this.sound.add("briquet", { volume: 0.3 }),
+            gun: this.sound.add("gun", { volume: 0.3 }),
+            missile: this.sound.add("missile", { volume: 0.3 }),
+            avion: this.sound.add("avion", { volume: 0.3 }),
+            music: this.sound.add("music", { volume: 0.3 }),
         };
         this.sounds.music.play();
 
@@ -232,7 +240,7 @@ class Game extends Phaser.Scene {
         window.chrono = 0;
         window.posWario = 750;
         window.actualMove = 0;
-        window.timerWario = 0
+        window.timerWario = 0;
 
         this.anims.create({
             key: "warioQuiVole",
@@ -242,46 +250,55 @@ class Game extends Phaser.Scene {
         });
 
         window.warioEstMort = 0;
-        function colisionWarioBalle(){
-            warioEstMort=1;
-            console.log("bgh")
-            this.wario.y=window.config.height+500
+        function colisionWarioBalle() {
+            warioEstMort = 1;
+            console.log("bgh");
+            this.wario.y = window.config.height + 500;
         }
         this.ballePlayer = this.physics.add.sprite(110, 800, "munitionPlayer");
-        this.ballePlayer.y=window.config.height+500;
-        this.ballePlayer.x=window.config.width+500;
+        this.ballePlayer.y = window.config.height + 500;
+        this.ballePlayer.x = window.config.width + 500;
         this.ballePlayer.setScale(0.25);
         this.ballePlayer.rotation = 1.57;
         this.ballePlayer.body.allowGravity = false;
         this.ballePlayer.setVelocityX(800);
-        
+
         this.physics.add.overlap(this.wario, this.ballePlayer, colisionWarioBalle, null, this);
 
         window.target = new Phaser.Math.Vector2();
         target.x = 1100;
         target.y = 800;
-    }  
-    
+
+        window.fly = 0;
+
+        window.soundsFly = this.sounds.flying;
+        window.soundsFly.loop = true;
+        window.soundsFly.play();
+        window.soundsFly.pause();
+    }
+
     update(time, delta) {
-        if (warioEstMort==1){
+        if (warioEstMort == 1) {
             timerWario++;
         }
-        if (timerWario>=400){
-            timerWario=0;
-            warioEstMort=0;
+        if (timerWario >= 400) {
+            timerWario = 0;
+            warioEstMort = 0;
             this.physics.moveToObject(this.wario, target, 200);
         }
-        if (this.input.activePointer.isDown  && this.ballePlayer.x>window.config.width) {
-            this.ballePlayer.y=this.player.y;
-            this.ballePlayer.x=this.player.x+45;
+        if (this.input.activePointer.isDown && this.ballePlayer.x > window.config.width) {
+            this.ballePlayer.y = this.player.y;
+            this.ballePlayer.x = this.player.x + 45;
+            this.sounds.gun.play();
         }
-        if (posWario >= 250 && actualMove == 0 && warioEstMort!=1) {
+
+        if (posWario >= 250 && actualMove == 0 && warioEstMort != 1) {
             posWario = posWario - 0.65;
             this.wario.y = posWario;
             if (posWario <= 250) {
                 actualMove = 1;
             }
-        } else if(warioEstMort!=1) {
+        } else if (warioEstMort != 1) {
             posWario = posWario + 0.65;
             this.wario.y = posWario;
             if (posWario >= 800) {
@@ -299,6 +316,7 @@ class Game extends Phaser.Scene {
             this.physics.add.overlap(this.player, this.fire, deadColision, null, this);
             this.fire.setVelocityX(-420);
             window.chrono = 0;
+            this.sounds.briquet.play();
         } else {
             window.chrono++;
         }
@@ -312,7 +330,9 @@ class Game extends Phaser.Scene {
         // this.tree.setVelocityX(-10)
         // moveTo(this.tree,-10,0,[10])
         // this.tree.setVelocityY(0)
-        if (this.rafale.x < 4 * window.config.width) {
+        if (this.rafale.x > 6 * window.config.width && this.rafale.x < 7 * window.config.width) {
+            this.sounds.avion.play();
+        } else if (this.rafale.x < 4 * window.config.width) {
             this.danger.x = window.config.width - 80;
             this.danger.y = this.rafale.y;
         } else if (this.rafale.x > 4 * window.config.width) {
@@ -324,7 +344,10 @@ class Game extends Phaser.Scene {
             this.rafale.x = 15 * window.config.width + 100;
             this.rafale.y = Math.random() * (window.config.height - 530);
         }
-        // if (this.rafale.x < )
+
+        if (this.missile.x > 1.2 * window.config.width && this.missile.x < 2 * window.config.width) {
+            this.sounds.missile.play();
+        }
         if (this.missile.x < 0 - this.missile.width) {
             this.missile.x = 3 * window.config.width + 100;
             this.missile.y = Math.random() * (window.config.height - 330);
@@ -366,8 +389,15 @@ class Game extends Phaser.Scene {
         if (this.cursors.space.isDown) {
             this.player.setVelocityY(-450);
             this.player.anims.play("jumping", true);
+            if (window.fly == 0) {
+                window.soundsFly.play();
+                window.fly = 1;
+            }
         } else if (this.player.body.touching.down) {
             this.player.anims.play("running", true);
+        } else {
+            this.sounds.flying.pause();
+            window.fly = 0;
         }
 
         // Si on appuie sur "espace"
@@ -391,14 +421,14 @@ class Game extends Phaser.Scene {
             }
         }
         // Si on clique sur 'gauche' ou 'droite'
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown || this.input.keyboard.addKey("Q").isDown) {
             this.player.flipX = true;
 
             this.player.setVelocityX(-200);
             // this.player.x -= 0.3 * delta;
             this.particles.setAngle({ min: 30, max: 40 });
             this.particles.startFollow(this.player, 20, 15);
-        } else if (this.cursors.right.isDown) {
+        } else if (this.cursors.right.isDown || this.input.keyboard.addKey("D").isDown) {
             this.player.flipX = false;
             this.player.setVelocityX(200);
             // this.player.x += 0.3 * delta;

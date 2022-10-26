@@ -4,7 +4,7 @@ class Menu extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("backgroundMenu", "dist/assets/img/backgroundMenu.jpg");
+        this.load.image("backgroundMenu", "dist/assets/img/backgroundMenu2.jpg");
     }
 
     create() {
@@ -15,11 +15,11 @@ class Menu extends Phaser.Scene {
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         const title = this.add
-            .text(screenCenterX, screenCenterY - 240, "LegoCollect", { fill: "#ffffff", font: "900 50px Poppins", backgroundColor: "#EE82EE" })
+            .text(screenCenterX, screenCenterY - 240, "The Lego War", { fill: "#ffffff", font: "900 50px Poppins", backgroundColor: "#EE82EE" })
             .setOrigin(0.5)
             .setPadding(150, 15);
-
-        const restartText = this.add
+            
+            const restartText = this.add
             .text(screenCenterX, screenCenterY, "Start Game", { fill: "#0f0", font: "900 40px Poppins", backgroundColor: "#fffff" })
             .setOrigin(0.5)
             .setPadding(30, 15)
@@ -27,7 +27,11 @@ class Menu extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.scene.start("Game");
             });
-    }
+
+            const rules = this.add
+                .text(screenCenterX, screenCenterY + 240, "Survie le plus longtemps possible ! Évite les avions, les missiles, tue Wario. Espace pour actionner tes propulseurs, Q et D pour t'orienter (ou flèche directionnel), clic gauche pour tirer.", { fill: "#ffffff", font: "900 25px Poppins", wordWrap: { width: this.cameras.main.width- this.cameras.main.width/4 }})
+                .setOrigin(0.5)
+        }
 
     update(time, delta) {}
 }
