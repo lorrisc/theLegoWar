@@ -233,7 +233,7 @@ class Game extends Phaser.Scene {
         this.danger = this.add.image(window.config.width + 500, window.config.height + 500, "danger");
         this.danger.setScale(0.5);
 
-        this.wario = this.physics.add.sprite(1100, 800, "wario");
+        this.wario = this.physics.add.sprite(window.innerWidth / 1.5 - 100, 800, "wario");
         this.wario.body.allowGravity = false;
         this.wario.setScale(-3, 3);
 
@@ -266,7 +266,7 @@ class Game extends Phaser.Scene {
         this.physics.add.overlap(this.wario, this.ballePlayer, colisionWarioBalle, null, this);
 
         window.target = new Phaser.Math.Vector2();
-        target.x = 1100;
+        target.x = window.innerWidth / 1.5 - 100;
         target.y = 800;
 
         window.fly = 0;
@@ -310,7 +310,7 @@ class Game extends Phaser.Scene {
             this.sounds.music.pause();
         }
         if (window.chrono == 300) {
-            this.fire = this.physics.add.sprite(1000, this.wario.y, "fire");
+            this.fire = this.physics.add.sprite(window.innerWidth / 1.5 - 200, this.wario.y, "fire");
             this.fire.body.allowGravity = false;
             this.fire.setScale(0.07);
             this.physics.add.overlap(this.player, this.fire, deadColision, null, this);
