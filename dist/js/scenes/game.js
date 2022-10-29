@@ -195,8 +195,8 @@ class Game extends Phaser.Scene {
         this.physics.add.collider(this.rock, this.grass);
 
         function deadColision() {
+            this.game.sound.stopAll();
             this.scene.start("End");
-            this.sounds.music.pause();
         }
         //https://phaser.io/examples/v2/arcade-physics/gravity
         this.physics.add.overlap(this.player, this.tree, deadColision, null, this);
