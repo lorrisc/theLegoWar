@@ -11,7 +11,6 @@ class Game extends Phaser.Scene {
         this.load.image("coin", "dist/assets/img/ai-coin.png");
         this.load.image("fire", "dist/assets/img/fire.png");
         this.load.image("munitionPlayer", "dist/assets/img/munition.png");
-
         this.load.image("tree", "dist/assets/img/tree.png");
         this.load.image("rock", "dist/assets/img/rock.png");
 
@@ -58,6 +57,8 @@ class Game extends Phaser.Scene {
             .tileSprite(0, window.config.height - 50, window.config.width, 30, "grass")
             .setOrigin(0, 0)
             .setScale(2);
+
+        //*---------------- CLOUD CREATION
         // Première boucle qui itère 3 fois, car il y a 3 couches de nuages
         for (let couche = 1; couche <= 3; couche++) {
             // Deuxième boucle qui itère 5 fois, car il y a 5 nuages par couche
@@ -77,6 +78,8 @@ class Game extends Phaser.Scene {
         }
 
         this.score = this.add.text(0, 0, "Score : " + window.score, { fill: "#000000", font: "800 25px Poppins", backgroundColor: "#01B661" }).setPadding(30, 15);
+
+        //*---------------- PLAYER
         this.player = this.physics.add.sprite(200, 500, "thePlayer");
         this.player.setBounce(0.1);
         this.player.setScale(0.4);
@@ -84,6 +87,7 @@ class Game extends Phaser.Scene {
         this.physics.add.existing(this.grass, true);
         this.physics.add.collider(this.player, this.grass);
 
+        //*---------------- OKAYER ANIMATION
         this.anims.create({
             key: "running",
             frames: this.anims.generateFrameNumbers("thePlayer", { start: 0, end: 3 }),
@@ -104,8 +108,10 @@ class Game extends Phaser.Scene {
             frameRate: 10,
             repeat: 0,
         });
+
         this.cursors = this.input.keyboard.createCursorKeys();
 
+        //*---------------- COINS
         this.particles = this.add.particles("piece").createEmitter({
             speed: 1000,
             scale: { start: 0.05, end: 0.05 },
@@ -118,6 +124,7 @@ class Game extends Phaser.Scene {
 
         this.particles.startFollow(this.player, -20, 15);
 
+        //*---------------- SOUND
         this.sounds = {
             step_left: [this.sound.add("step_left_1"), this.sound.add("step_left_2"), this.sound.add("step_left_3")],
             step_right: [this.sound.add("step_right_1"), this.sound.add("step_right_2"), this.sound.add("step_right_3")],
@@ -133,14 +140,13 @@ class Game extends Phaser.Scene {
         };
         this.sounds.music.play();
 
+        //*---------------- COLLECT STAR
         function collectStar(player, coin) {
-            // var collectSong = new Audio('Ressources/ding.mp3');
-            // collectSong.play();
-
             coin.disableBody(true, true);
 
             window.score++;
 
+            //une pièce récupéré = une nouvelle piece
             let newCoin = this.physics.add
                 .sprite(Math.random() * window.config.width + window.config.width, Math.random() * (window.config.height - 130), "coin")
                 .setOrigin(0, 0)
@@ -150,9 +156,9 @@ class Game extends Phaser.Scene {
             this.coins.push(newCoin);
         }
 
+        //*---------------- COIN CREATION
         this.coins = [];
         for (let p = 0; p <= 4; p++) {
-            // let coin = this.physics.add
             let coin = this.physics.add
                 // .staticImage(
                 .sprite(
@@ -175,19 +181,17 @@ class Game extends Phaser.Scene {
         }
 
         this.physics.add.overlap(this.player, this.coins, collectStar, null, this);
-        // this.coins.setGravitX(0);
 
         this.score = this.add.text(0, 0, "Score : " + window.score, { fill: "#000000", font: "800 25px Poppins", backgroundColor: "#01B661" }).setPadding(30, 15);
 
+        //*---------------- TREE CREATION
         this.tree = this.physics.add.sprite(700, window.config.height - 50 - 137.25, "tree");
         this.tree.setScale(0.75);
-        // this.physics.moveTo(this.tree,0,this.tree.y,1)
         this.tree.setVelocityX(-200);
         this.tree.setVelocityY(-20);
         this.physics.add.collider(this.tree, this.grass);
 
-        console.log(this.tree.body);
-
+        //*---------------- ROCK CREATION
         this.rock = this.physics.add.sprite(1100, window.config.height - 50 - 90.5 / 2, "rock");
         this.rock.setScale(0.5);
         this.rock.setVelocityX(-51);
@@ -202,6 +206,7 @@ class Game extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.tree, deadColision, null, this);
         this.physics.add.overlap(this.player, this.rock, deadColision, null, this);
 
+        //*---------------- MISSILE CREATION
         this.missile = this.physics.add.sprite(5000, Math.random() * (window.config.height - 330), "missile");
         this.missile.body.allowGravity = false;
         this.missile.rotation = 11;
@@ -209,6 +214,7 @@ class Game extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.missile, deadColision, null, this);
         this.missile.setVelocityX(-700);
 
+        //missile animation
         this.anims.create({
             key: "missileMovement",
             frames: this.anims.generateFrameNumbers("missile", { start: 0, end: 2 }),
@@ -216,6 +222,7 @@ class Game extends Phaser.Scene {
             repeat: -1,
         });
 
+        //*---------------- PLANE CREATION
         this.rafale = this.physics.add.sprite(5000, Math.random() * (window.config.height - 530), "rafale");
         this.rafale.body.allowGravity = false;
         this.rafale.setScale(5);
@@ -223,6 +230,7 @@ class Game extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.rafale, deadColision, null, this);
         this.rafale.setVelocityX(-1300);
 
+        //plane animation
         this.anims.create({
             key: "rafaleMovement",
             frames: this.anims.generateFrameNumbers("rafale", { start: 0, end: 4 }),
@@ -233,15 +241,18 @@ class Game extends Phaser.Scene {
         this.danger = this.add.image(window.config.width + 500, window.config.height + 500, "danger");
         this.danger.setScale(0.5);
 
+        //*---------------- WARIO CREATION
         this.wario = this.physics.add.sprite(window.innerWidth / 1.5 - 100, 800, "wario");
         this.wario.body.allowGravity = false;
         this.wario.setScale(-3, 3);
 
+        //*---------------- VAR CREATION
         window.chrono = 0;
         window.posWario = 750;
         window.actualMove = 0;
         window.timerWario = 0;
 
+        //*---------------- WARIO ANIMATION
         this.anims.create({
             key: "warioQuiVole",
             frames: this.anims.generateFrameNumbers("wario", { start: 0, end: 3 }),
@@ -252,9 +263,10 @@ class Game extends Phaser.Scene {
         window.warioEstMort = 0;
         function colisionWarioBalle() {
             warioEstMort = 1;
-            console.log("bgh");
             this.wario.y = window.config.height + 500;
         }
+
+        //*---------------- BULLET PROPERTY
         this.ballePlayer = this.physics.add.sprite(110, 800, "munitionPlayer");
         this.ballePlayer.y = window.config.height + 500;
         this.ballePlayer.x = window.config.width + 500;
@@ -286,6 +298,7 @@ class Game extends Phaser.Scene {
             warioEstMort = 0;
             this.physics.moveToObject(this.wario, target, 200);
         }
+        //*---------------- PLAYER SHOT
         if (this.input.activePointer.isDown && this.ballePlayer.x > window.config.width) {
             this.ballePlayer.y = this.player.y;
             this.ballePlayer.x = this.player.x + 45;
